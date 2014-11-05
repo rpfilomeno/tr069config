@@ -1,0 +1,19 @@
+{
+    "name": "crosspoint/tr069config",
+    "description": "description_text",
+    "minimum-stability": "dev",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Roger Filomeno",
+            "email": "roger.filomeno@crosspoint-telecom.com"
+        }
+    ],
+    "require": {
+        "corneltek/cliframework": "2.0.2",
+        "guzzle/guzzle": "v3.9.2"
+    },
+    "autoload": {
+        "psr-4": {"Tr069Config\\":""}
+    }
+}
