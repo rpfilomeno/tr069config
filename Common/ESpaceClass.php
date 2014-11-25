@@ -68,6 +68,8 @@ class EspaceClass
         $response = $request->send();
         $response = json_decode( $response->getBody(true));
         $this->sessionId =  (isset($response->data)) ? $response->data : null;
+        $this->sessionId = json_decode($this->sessionId);
+        $this->sessionId = $this->sessionId->szSessionID;
         return $response;
     }
 
