@@ -74,8 +74,10 @@ class AutoConfigCommand extends Command
             return false;
         }
 
-        foreach ($txtConfigs as $deviceIp) {
+        foreach ($txtConfigs as $deviceIpDetailsLine) {
             try {
+                $deviceIpDetails = explode(',',$deviceIpDetailsLine);
+                $deviceIp = $deviceIpDetails[0];
 
                 $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
 

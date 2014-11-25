@@ -90,7 +90,36 @@ class ScanCommand extends Command
                 }
 
                 $this->logger->info('eSpace device found at '.$deviceIp);
-                $ipList[] = $deviceIp;
+
+                $response = $eSpace->requestVersionInfo();
+                $this->logger->debug('EspaceClass::requestVersionInfo = ' . var_export($response, true));
+                if (!$response->success) {
+                    $this->logger->error('Cannot get hardware information.');
+                    continue;
+                }
+
+                $hardwareInfo = json_decode($response->data)->stMainVersionInfo;
+                $this->logger->debug('EspaceClass::requestVersionInfo->data(StdClass) = ' . var_export($hardwareInfo, true));
+                $this->logger->info("Hardware Information = \n\tMain SoftWare Version: " . $hardwareInfo->szMainSoftWareVersion
+                    . "\n\tBoot Version:          " . $hardwareInfo->szBootVersion
+                    . "\n\tHardWare Version:      " . $hardwareInfo->szHardWareVersion
+                    . "\n\tSerial Number:         " . $hardwareInfo->szSN
+                    . "\n\tBuild Version:         " . $hardwareInfo->szBuildVersion
+                );
+
+
+
+
+
+
+
+                $ipList[] = $deviceIp . ','
+                    . $hardwareInfo->szSN . ','
+                    . $hardwareInfo->szMainSoftWareVersion . ','
+                    . $hardwareInfo->szBootVersion . ','
+                    . $hardwareInfo->szHardWareVersion . ','
+                    . $hardwareInfo->szBuildVersion
+                ;
 
             } catch (\Exception $e) {
                 $this->logger->debug($e->getMessage());
