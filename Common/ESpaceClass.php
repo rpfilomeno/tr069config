@@ -49,6 +49,9 @@ class EspaceClass
 
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
+        $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
+        $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
+        $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
 
         $response = $request->send();
         return json_decode( $response->getBody(true));
@@ -62,6 +65,9 @@ class EspaceClass
         ],'{"szUserName":"' . $username . '","szPassword":"' . base64_encode($password) . '"}');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
+        $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
+        $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
+        $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
         $response = $request->send();
         return json_decode( $response->getBody(true));
     }
@@ -73,6 +79,9 @@ class EspaceClass
         ],'');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
+        $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
+        $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
+        $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
         $response = $request->send();
         return json_decode( $response->getBody(true));
     }
@@ -81,6 +90,9 @@ class EspaceClass
         $request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,null,['file' => '@'.$filename]);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
+        $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
+        $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
+        $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
         $response = $request->send();
         return json_decode( $response->getBody(true));
     }
