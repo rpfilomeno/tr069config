@@ -30,6 +30,7 @@ class AutoConfigCommand extends Command
     {
         // command options
         $opts->add('w|write', 'write the generated xml file.');
+        $opts->add('i|insecure:', 'force non-https connection.');
     }
 
     public function arguments($args)
@@ -79,7 +80,9 @@ class AutoConfigCommand extends Command
                 $deviceIpDetails = explode(',',$deviceIpDetailsLine);
                 $deviceIp = $deviceIpDetails[0];
 
-                $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+
+                $schema = ($this->options->has('insecure')) ? 'http' : 'https';
+                $eSpace = new \Tr069Config\Espace\EspaceClass($schema.'://' . $deviceIp, null, $eSpaceUsername);
                 if($this->options->has('debug')) $eSpace->setDebug(true);
 
                 $response = $eSpace->requestSession($eSpaceUsername);
