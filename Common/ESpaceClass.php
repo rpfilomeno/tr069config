@@ -27,11 +27,11 @@ class EspaceClass
 
     public function __construct($baseUrl = '', $config = null)
     {
-        if($config == null) $config = array(
-            'request.options' => array(
-                'proxy'   => 'tcp://localhost:8080'
-            )
-        );
+        #if($config == null) $config = array(
+        #    'request.options' => array(
+        #        'proxy'   => 'tcp://localhost:8080'
+        #    )
+        #);
         $this->client = new \Guzzle\Http\Client($baseUrl,$config);
         $this->cookiePlugin = new \Guzzle\Plugin\Cookie\CookiePlugin( new  \Guzzle\Plugin\Cookie\CookieJar\FileCookieJar( tempnam(sys_get_temp_dir(), 'ESpace') ) );
         $this->client->addSubscriber($this->cookiePlugin);
