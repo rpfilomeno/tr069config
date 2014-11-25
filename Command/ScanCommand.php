@@ -28,6 +28,7 @@ class ScanCommand extends Command
         // command options
         $opts->add('w|write:', 'write the IP addresses of detected eSpace devices.');
         $opts->add('i|insecure', 'force non-https connection.');
+        $opts->add('h|hash-password', 'provide password as a hash rather than plain-text.');
 
     }
 
@@ -78,6 +79,7 @@ class ScanCommand extends Command
 
                 $schema = ($this->options->has('insecure')) ? 'http' : 'https';
                 $eSpace = new \Tr069Config\Espace\EspaceClass($schema.'://' . $deviceIp, null, $eSpaceUsername);
+                if($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
                 if($this->options->has('debug')) $eSpace->setDebug(true);
 
                 $response = $eSpace->requestSession($eSpaceUsername);

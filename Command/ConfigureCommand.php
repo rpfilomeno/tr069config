@@ -35,6 +35,7 @@ class ConfigureCommand extends Command
         $opts->add('w|write:', 'write the generated xml file.');
         $opts->add('y|yes', 'auto confirm prompts.');
         $opts->add('i|insecure', 'force non-https connection.');
+        $opts->add('h|hash-password', 'provide password as a hash rather than plain-text.');
 
 
 
@@ -91,7 +92,7 @@ class ConfigureCommand extends Command
 
             $schema = ($this->options->has('insecure')) ? 'http' : 'https';
             $eSpace = new \Tr069Config\Espace\EspaceClass($schema.'://' . $deviceIp, null, $eSpaceUsername);
-
+            if($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
             if($this->options->has('debug')) $eSpace->setDebug(true);
 
             $response = $eSpace->requestSession($eSpaceUsername);

@@ -24,6 +24,7 @@ class EspaceClass
     private $cookiePlugin = null;
 
     private $isDebug = false;
+    private $isHashPassword = false;
 
     public function __construct($baseUrl = '', $config = null)
     {
@@ -39,6 +40,11 @@ class EspaceClass
     public function setDebug( $isDebug=false )
     {
         $this->isDebug = $isDebug;
+    }
+
+    public function setUseHashPassword( $isHashPassword=false )
+    {
+        $this->isHashPassword = $isHashPassword;
     }
 
     public function requestSession($username)
@@ -59,10 +65,11 @@ class EspaceClass
 
     public function requestCertificate( $username = 'admin', $password = '' )
     {
+        $password = ($this->isHashPassword) ? $password : base64_encode($password);
         $request = $this->client->post(EspaceClass::ESPACE_WEB_RequestCertificate,[
             'Content-Type'=>'application/json',
             'debug' => $this->isDebug,
-        ],'{"szUserName":"' . $username . '","szPassword":"' . base64_encode($password) . '"}');
+        ],'{"szUserName":"' . $username . '","szPassword":"' . $password . '"}');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
         $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
