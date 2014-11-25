@@ -74,6 +74,7 @@ class ScanCommand extends Command
                 $this->logger->debug('Checking IP "' . $deviceIp . '".');
 
                 $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+                if($this->options->has('debug')) $eSpace->setDebug(true);
 
                 $response = $eSpace->requestSession($eSpaceUsername);
                 $this->logger->debug('EspaceClass::requestSession = ' . var_export($response, true));

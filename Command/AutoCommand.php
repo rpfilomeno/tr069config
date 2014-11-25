@@ -80,6 +80,7 @@ class AutoConfigCommand extends Command
                 $deviceIp = $deviceIpDetails[0];
 
                 $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+                if($this->options->has('debug')) $eSpace->setDebug(true);
 
                 $response = $eSpace->requestSession($eSpaceUsername);
                 $this->logger->debug('EspaceClass::requestSession = ' . var_export($response, true));
