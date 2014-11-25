@@ -46,7 +46,7 @@ class AutoConfigCommand extends Command
 
 
         $this->logger->info('Configuring eSpace devices defined in "' . $txtConfigFilename . '"  using XML "' . $xmlConfigFilename . '" with  account details from "' . $csvConfigFilename . '"');
-
+        if($this->options->has('debug')) $this->logger->info('[Debugging is enabled]');
 
         if (file_exists($csvConfigFilename)) {
             $rows = array_map('str_getcsv', file($csvConfigFilename));

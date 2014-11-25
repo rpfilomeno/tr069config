@@ -63,7 +63,9 @@ class ScanCommand extends Command
 
         if($e !== false) return false;
 
+
         $this->logger->info('Scanning IP range "' . $startIp . ' -> ' . $endIp . '" ...');
+        if($this->options->has('debug')) $this->logger->info('[Debugging is enabled]');
 
         $i = $startIpLong-1;
         while( $i <= $endIpLong) {

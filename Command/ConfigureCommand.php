@@ -67,6 +67,7 @@ class ConfigureCommand extends Command
         if ($e !== false) return false;
 
         $this->logger->info('Configuring eSpace device with IP "' . $deviceIp . ' using XML ' . $xmlConfigFilename . '" ...');
+        if($this->options->has('debug')) $this->logger->info('[Debugging is enabled]');
 
         try {
 
