@@ -14,6 +14,12 @@ Configure the devices listed in file ip-list.txt by login in using admin/admin12
 
 $ php tr069config.php --debug autoconfig --insecure --hash-password admin admin123 Config-eSpace7950.xml accounts-list.csv ip-list.txt
 
+Configure a single device and providing different xml template
+
+$ php tr069config.php --debug configure --insecure --hash-password --read accounts-list.csv --write Config-Save-10.1.60.15.xml --yes 10.1.60.15 admin admin123 Config-eSpace7950-EP11MPUA-VER.C.xml
+
+$ php tr069config.php --debug configure --insecure --hash-password --read accounts-list.csv --write Config-Save-10.1.60.22.xml --yes 10.1.60.22 admin admin123 Config-eSpace7950-EP11MPUA-VER.B.xml
+
 How to build from scratch
 =========================
 
