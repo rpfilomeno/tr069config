@@ -67,13 +67,16 @@ try {
     $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBuildVersion.'xml';
     $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szHardWareVersion.'xml';
     $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBootVersion.'xml';
+
     foreach($altXmlConfigFilenames as $altXmlConfigFilename) {
         $testAltXmlConfigFilename = realpath(dirname(__FILE__)).'/xmlconfig/'.$altXmlConfigFilename;
         if(file_exists($testAltXmlConfigFilename)) {
             $xmlConfigFilename = $testAltXmlConfigFilename;
-            error_log('Using matching stored xml configuration file  ' . $altXmlConfigFilename  .' for '.$deviceIp);
+
         }
     }
+
+    error_log('Using matching stored xml configuration file  ' . $xmlConfigFilename  .' for '.$deviceIp);
 
 
 
