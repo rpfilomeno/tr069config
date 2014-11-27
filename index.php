@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 require 'vendor/autoload.php';
 
 if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -12,8 +13,8 @@ if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 
 $csvConfigFilename = 'accounts-list.csv';
 $xmlConfigFilename = 'Config-eSpace7910.xml';
-$eSpaceUsername = admin;
-$eSpacePassword = admin123;
+$eSpaceUsername = 'admin';
+$eSpacePassword = 'admin123';
 $csvConfigData = null;
 
 try {
@@ -306,7 +307,6 @@ try {
     }
 } catch (\Exception $e) {
     error_log($e->getMessage());
-
 }
 
 
