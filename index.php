@@ -181,7 +181,7 @@ try {
             $input = filter_var($input, FILTER_SANITIZE_STRING);
             $nodeUIEMUser->setAttribute('PassWord', $input);
         }
-        $this->logger->debug("XML Configutation updated = \n" . $xmlConfig->saveXML($nodeUIEMUser));
+
     }
 
 //ManagementServer
