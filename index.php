@@ -2,7 +2,9 @@
 error_reporting(E_ALL);
 require 'vendor/autoload.php';
 
-if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+if (!empty($_REQUEST['IPADDR'])) {
+    $deviceIp=  $_REQUEST['IPADDR'];
+} elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
     $deviceIp = $_SERVER['HTTP_CLIENT_IP'];
 } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
     $deviceIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
