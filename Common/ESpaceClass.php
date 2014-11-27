@@ -66,6 +66,7 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
 
         $response = $request->send();
+        if (!$response->success) return $response;
         $response = json_decode( $response->getBody(true));
         $this->sessionId =  (isset($response->data)) ? $response->data : null;
         $this->sessionId = json_decode($this->sessionId);
