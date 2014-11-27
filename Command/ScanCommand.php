@@ -28,6 +28,7 @@ class ScanCommand extends Command
         // command options
         $opts->add('w|write:', 'write the IP addresses of detected eSpace devices.');
         $opts->add('i|insecure', 'force non-https connection.');
+        $opts->add('s|secure', 'force non-https connection.');
         $opts->add('h|hash-password', 'provide password as a hash rather than plain-text.');
 
     }
@@ -75,14 +76,38 @@ class ScanCommand extends Command
                 $i++;
                 $deviceIp = long2ip($i);
 
-                $this->logger->debug('Checking IP "' . $deviceIp . '".');
 
-                $schema = ($this->options->has('insecure')) ? 'http' : 'https';
-                $eSpace = new \Tr069Config\Espace\EspaceClass($schema.'://' . $deviceIp, null, $eSpaceUsername);
-                if($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
-                if($this->options->has('debug')) $eSpace->setDebug(true);
 
-                $response = $eSpace->requestSession($eSpaceUsername);
+
+                if ($this->options->has('insecure')) { //force insecure
+                    $this->logger->debug('Checking IP "' . $deviceIp . '" (force insecure).');
+                    $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
+                    if ($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
+                    if ($this->options->has('debug')) $eSpace->setDebug(true);
+                    $response = $eSpace->requestSession($eSpaceUsername);
+                }elseif ($this->options->has('secure')) { //force secure
+                    $this->logger->debug('Checking IP "' . $deviceIp . '" (force insecure).');
+                    $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+                    if ($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
+                    if ($this->options->has('debug')) $eSpace->setDebug(true);
+                    $response = $eSpace->requestSession($eSpaceUsername);
+                } else { //secure then fall back to insecure
+                    $this->logger->debug('Checking IP "' . $deviceIp . '".');
+                    $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+                    if($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
+                    if($this->options->has('debug')) $eSpace->setDebug(true);
+                    $response = $eSpace->requestSession($eSpaceUsername);
+
+                    if (!$response->success) {
+                        $this->logger->debug('Unable to open secure session to client, trying insecure method on IP "' . $deviceIp . '".');
+                        $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
+                        if($this->options->has('hash-password')) $eSpace->setUseHashPassword(true);
+                        if($this->options->has('debug')) $eSpace->setDebug(true);
+                        $response = $eSpace->requestSession($eSpaceUsername);
+                    }
+                }
+
+
                 $this->logger->debug('EspaceClass::requestSession = ' . var_export($response, true));
                 if (!$response->success) {
                     $this->logger->error('Unable to create new session.');
