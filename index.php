@@ -70,9 +70,12 @@ try {
 
     foreach ($altXmlConfigFilenames as $altXmlConfigFilename) {
         $testAltXmlConfigFilename = realpath(dirname(__FILE__)) . '/xmlconfig/' . $altXmlConfigFilename;
+        error_log('Looking for  stored xml configuration file  ' . $testAltXmlConfigFilename . ' for ' . $deviceIp);
         if (file_exists($testAltXmlConfigFilename)) {
             $xmlConfigFilename = $testAltXmlConfigFilename;
 
+        } else {
+            error_log('Configuration file  ' . $testAltXmlConfigFilename . ' for ' . $deviceIp . ' not found.');
         }
     }
 
