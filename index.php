@@ -63,10 +63,11 @@ if (file_exists($csvConfigFilename)) {
 try {
     //lookup if alternate xml config file if exist in xmlconfig directory
     $altXmlConfigFilenames = array();
-    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szSN . 'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szBuildVersion . 'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szHardWareVersion . 'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szBootVersion . 'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szSN . '.xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szBuildVersion . '.xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . str_replace(' ','-',$hardwareInfo->szHardWareVersion) . '.xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . str_replace(' ','-',$hardwareInfo->szBootVersion) . '.xml';
+
 
     foreach ($altXmlConfigFilenames as $altXmlConfigFilename) {
         $testAltXmlConfigFilename = realpath(dirname(__FILE__)) . '/xmlconfig/' . $altXmlConfigFilename;
