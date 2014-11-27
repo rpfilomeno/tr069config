@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 require 'vendor/autoload.php';
 
 if (!empty($_REQUEST['IPADDR'])) {
-    $deviceIp=  $_REQUEST['IPADDR'];
+    $deviceIp = $_REQUEST['IPADDR'];
 } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
     $deviceIp = $_SERVER['HTTP_CLIENT_IP'];
 } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -19,65 +19,64 @@ $eSpaceUsername = 'admin';
 $eSpacePassword = 'admin123';
 $csvConfigData = null;
 
-try {
 
-    $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+$eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
+$response = $eSpace->requestSession($eSpaceUsername);
+if (!$response->success) {
+    error_log('Unable to open secure session to client, trying insecure method on ' . $deviceIp);
+    $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
     $response = $eSpace->requestSession($eSpaceUsername);
     if (!$response->success) {
-        error_log('Unable to open secure session to client, trying insecure method on ' . $deviceIp);
-        $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
-        $response = $eSpace->requestSession($eSpaceUsername);
-        if (!$response->success) {
-            error_log('Unable to open insecure session to client ' . $deviceIp);
-            exit;
-        }
-    }
-
-    $eSpace->setUseHashPassword(true);
-
-    $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
-    if (!$response->success) {
-        error_log('Unable to default login to client ' . $deviceIp);
+        error_log('Unable to open insecure session to client ' . $deviceIp);
         exit;
     }
+}
 
-    $response = $eSpace->requestVersionInfo();
+$eSpace->setUseHashPassword(true);
 
-    if (!$response->success) {
-        error_log('Cannot get hardware information of client ' . $deviceIp);
-        exit;
+$response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
+if (!$response->success) {
+    error_log('Unable to default login to client ' . $deviceIp);
+    exit;
+}
+
+$response = $eSpace->requestVersionInfo();
+
+if (!$response->success) {
+    error_log('Cannot get hardware information of client ' . $deviceIp);
+    exit;
+}
+$hardwareInfo = json_decode($response->data)->stMainVersionInfo;
+
+
+if (file_exists($csvConfigFilename)) {
+    $rows = array_map('str_getcsv', file($csvConfigFilename));
+    $header = array_shift($rows);
+    $csvConfigs = array();
+    foreach ($rows as $row) {
+        $csvConfigs[] = array_combine($header, $row);
     }
-    $hardwareInfo = json_decode($response->data)->stMainVersionInfo;
+} else {
+    exit;
+}
 
-
-    if (file_exists($csvConfigFilename)) {
-        $rows = array_map('str_getcsv', file($csvConfigFilename));
-        $header = array_shift($rows);
-        $csvConfigs = array();
-        foreach ($rows as $row) {
-            $csvConfigs[] = array_combine($header, $row);
-        }
-    } else {
-        exit;
-    }
-
+try {
     //lookup if alternate xml config file if exist in xmlconfig directory
-    $altXmlConfigFilenames=array();
-    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szSN.'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBuildVersion.'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szHardWareVersion.'xml';
-    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBootVersion.'xml';
+    $altXmlConfigFilenames = array();
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szSN . 'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szBuildVersion . 'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szHardWareVersion . 'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-' . $hardwareInfo->szBootVersion . 'xml';
 
-    foreach($altXmlConfigFilenames as $altXmlConfigFilename) {
-        $testAltXmlConfigFilename = realpath(dirname(__FILE__)).'/xmlconfig/'.$altXmlConfigFilename;
-        if(file_exists($testAltXmlConfigFilename)) {
+    foreach ($altXmlConfigFilenames as $altXmlConfigFilename) {
+        $testAltXmlConfigFilename = realpath(dirname(__FILE__)) . '/xmlconfig/' . $altXmlConfigFilename;
+        if (file_exists($testAltXmlConfigFilename)) {
             $xmlConfigFilename = $testAltXmlConfigFilename;
 
         }
     }
 
-    error_log('Using matching stored xml configuration file  ' . $xmlConfigFilename  .' for '.$deviceIp);
-
+    error_log('Using matching stored xml configuration file  ' . $xmlConfigFilename . ' for ' . $deviceIp);
 
 
     $xmlConfig = new \DOMDocument();
@@ -308,7 +307,7 @@ try {
 
     $response = $eSpace->requestImportConfig($temp_file);
     if (!$response->success) {
-        error_log('Failed upload XML configuration to device '.$deviceIp);
+        error_log('Failed upload XML configuration to device ' . $deviceIp);
     }
 } catch (\Exception $e) {
     error_log($e->getMessage());
