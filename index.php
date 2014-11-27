@@ -28,7 +28,7 @@ try {
         $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
         $response = $eSpace->requestSession($eSpaceUsername);
         if (!$response->success) {
-            error_log('Unable to open secure session to client ' . $deviceIp);
+            error_log('Unable to open ingitsecure session to client ' . $deviceIp);
             exit;
         }
     }
