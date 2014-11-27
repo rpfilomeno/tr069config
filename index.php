@@ -10,7 +10,7 @@ if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 }
 
 
-$csvConfigFilename = 'Config-eSpace7910.csv';
+$csvConfigFilename = 'accounts-list.csv';
 $xmlConfigFilename = 'Config-eSpace7910.xml';
 $eSpaceUsername = admin;
 $eSpacePassword = admin123;
@@ -19,12 +19,18 @@ $csvConfigData = null;
 try {
 
     $eSpace = new \Tr069Config\Espace\EspaceClass('https://' . $deviceIp, null, $eSpaceUsername);
-
     $response = $eSpace->requestSession($eSpaceUsername);
     if (!$response->success) {
-        error_log('Unable to open session to client ' . $deviceIp);
-        exit;
+        error_log('Unable to open secure session to client, trying insecure method on ' . $deviceIp);
+        $eSpace = new \Tr069Config\Espace\EspaceClass('http://' . $deviceIp, null, $eSpaceUsername);
+        $response = $eSpace->requestSession($eSpaceUsername);
+        if (!$response->success) {
+            error_log('Unable to open secure session to client ' . $deviceIp);
+            exit;
+        }
     }
+
+    $eSpace->setUseHashPassword(true);
 
     $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
     if (!$response->success) {
@@ -51,6 +57,22 @@ try {
     } else {
         exit;
     }
+
+    //lookup if alternate xml config file if exist in xmlconfig directory
+    $altXmlConfigFilenames=array();
+    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szSN.'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBuildVersion.'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szHardWareVersion.'xml';
+    $altXmlConfigFilenames[] = 'Config-eSpace-'.$hardwareInfo->szBootVersion.'xml';
+    foreach($altXmlConfigFilenames as $altXmlConfigFilename) {
+        $testAltXmlConfigFilename = realpath(dirname(__FILE__)).'/xmlconfig/'.$altXmlConfigFilename;
+        if(file_exists($testAltXmlConfigFilename)) {
+            $xmlConfigFilename = $testAltXmlConfigFilename;
+            error_log('Using matching stored xml configuration file  ' . $altXmlConfigFilename  .' for '.$deviceIp);
+        }
+    }
+
+
 
     $xmlConfig = new \DOMDocument();
     $xmlConfig->load($xmlConfigFilename);
