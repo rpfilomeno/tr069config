@@ -53,9 +53,9 @@ class EspaceClass
         return $this->sessionId;
     }
 
-    public function requestSession($username)
+    public function requestSession($username='admin')
     {
-        $request = $this->client->get(EspaceClass::ESPACE_WEB_RequestSessionID,['cookies' => ['login_username_=admin']],[
+        $request = $this->client->get(EspaceClass::ESPACE_WEB_RequestSessionID,['cookies' => ['login_username_='.$username]],[
             'debug' => $this->isDebug,
         ]);
 
@@ -65,7 +65,14 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
 
-        $response = $request->send();
+        try {
+            $response = $request->send();
+        } catch (\Exception $e){
+            $response = new \stdClass();
+            $response->success = 0;
+            $response->data = '';
+            return $response;
+        }
 
         $response = json_decode( $response->getBody(true));
         if (!$response->success) return $response;
@@ -87,7 +94,14 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
-        $response = $request->send();
+        try {
+            $response = $request->send();
+        } catch (\Exception $e){
+            $response = new \stdClass();
+            $response->success = 0;
+            $response->data = '';
+            return $response;
+        }
         return json_decode( $response->getBody(true));
     }
 
@@ -101,7 +115,14 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
-        $response = $request->send();
+        try {
+            $response = $request->send();
+        } catch (\Exception $e){
+            $response = new \stdClass();
+            $response->success = 0;
+            $response->data = '';
+            return $response;
+        }
         return json_decode( $response->getBody(true));
     }
 
@@ -112,7 +133,14 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
-        $response = $request->send();
+        try{
+            $response = $request->send();
+        } catch (\Exception $e){
+            $response = new \stdClass();
+            $response->success = 0;
+            $response->data = '';
+            return $response;
+        }
         return json_decode( $response->getBody(true));
     }
 
