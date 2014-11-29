@@ -33,6 +33,7 @@ class ScanCommand extends Command
         $opts->add('u|username:', 'default username to connect to the device.');
         $opts->add('p|password:', 'default password to connect to the device.');
         $opts->add('a|accounts-list:', 'csv file containing the list of default usermame and password.');
+        $opts->add('t|timeout:', 'set the ping timeout in seconds.');
 
     }
 
@@ -89,6 +90,16 @@ class ScanCommand extends Command
                 $passwordModes = array(true, false);
             }
 
+            if ($this->options->has('timeout')) { //ping timeout
+                $pingTimeout =  filter_var($this->options['timeout']->value,FILTER_VALIDATE_INT);
+                if(!$pingTimeout) {
+                    $this->logger->error('Invalid ping timeout value.');
+                    return false; //invalid optional value, exit
+                }
+            } else {
+                $pingTimeout = 1;
+            }
+
             /*
              * checking config files
              */
@@ -136,6 +147,17 @@ class ScanCommand extends Command
 
                 $ipCounter++;
                 $deviceIp = long2ip($ipCounter);
+
+                //** ping the device */
+
+                $response = $this->ping($deviceIp,$pingTimeout);
+                $this->logger->debug('ScanCommand::ping = ' . var_export($response, true));
+                if(!$response) {
+                    $this->logger->debug('Device "' . $deviceIp . '" ping timeout.');
+                    continue;
+                }  else {
+                    $this->logger->debug('Device "' . $deviceIp . '" ping reply '.$response);
+                }
 
                 //** do accounts */
                 $i = 0;
@@ -233,5 +255,31 @@ class ScanCommand extends Command
             $this->logger->error($e->getMessage());
             return false;
         }
+
+    }
+
+    private function ping($host, $timeout = 1)
+    {
+        try {
+            /* ICMP ping packet with a pre-calculated checksum */
+            $package = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
+            $socket = socket_create(AF_INET, SOCK_RAW, 1);
+            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => $timeout, 'usec' => 0));
+            socket_connect($socket, $host, null);
+            $ts = microtime(true);
+            socket_send($socket, $package, strLen($package), 0);
+            if (socket_read($socket, 255)) {
+                $result = microtime(true) - $ts;
+            } else {
+                $result = false;
+            }
+            socket_close($socket);
+            return $result;
+
+
+        } catch (\Exception $e) {
+            return false;
+        }
+
     }
 }
