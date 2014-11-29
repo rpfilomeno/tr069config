@@ -107,7 +107,7 @@ class ScanCommand extends Command
             if ($this->options->has('accounts-list')) {
                 $defaultAccountsListFile = $this->options['accounts-list']->value;
             } else {
-                $defaultAccountsListFile = realpath(dirname(__FILE__)) . '/../data/default-accounts.csv';
+                $defaultAccountsListFile = realpath(dirname(__FILE__).'/../') . '/data/default-accounts.csv';
             }
             if (file_exists($defaultAccountsListFile)) {
                 $rows = array_map('str_getcsv', file($defaultAccountsListFile));
@@ -179,14 +179,14 @@ class ScanCommand extends Command
                         if (!$response->success) {
                             $this->logger->debug('Failed connection to device "' . $deviceIp
                                 . ' using ' . $connectionText
-                                . ' mode with username "'.$eSpaceUsername.'".'
-                                .'at attempt ' . $i . '/' . count($csvDefaultAccountList) . ''
+                                . ' mode with username "'.$eSpaceUsername.'"'
+                                . ' at attempt ' . $i . '/' . count($csvDefaultAccountList) . '.'
                             );
                         } else {
                             $this->logger->debug('Successful connection to device "' . $deviceIp
                                 . ' using ' . $connectionText
-                                . ' mode with username "'.$eSpaceUsername.'".'
-                                .'at attempt ' . $i . '/' . count($csvDefaultAccountList) . ''
+                                . ' mode with username "'.$eSpaceUsername.'"'
+                                . ' at attempt ' . $i . '/' . count($csvDefaultAccountList) . '.'
                             );
                             break; //stop trying other connection mode
                         }
@@ -235,7 +235,7 @@ class ScanCommand extends Command
                     $response = $eSpace->requestVersionInfo();
                     $this->logger->debug2('EspaceClass::requestVersionInfo = ' . var_export($response, true));
                     if (!$response->success) {
-                        $this->logger->error('Cannot get hardware information of ' . $deviceIp . '.');
+                        $this->logger->error('Cannot get hardware information for ' . $deviceIp . '.');
                         continue; // cant get info, try next IP
                     }
 

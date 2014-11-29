@@ -1,28 +1,48 @@
 <?php
+
+/*
+ * set up for background processing
+ */
+
+ob_start();
 error_reporting(E_ALL);
 ignore_user_abort(true);
 set_time_limit(0);
 
+/*
+ * check parameters
+ */
+
+
+if (!empty($_REQUEST['IPADDR'])) {
+    $deviceIp = $_REQUEST['IPADDR'];
+} elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+    $deviceIp = $_SERVER['HTTP_CLIENT_IP'];
+} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $deviceIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
+} else {
+    $deviceIp = $_SERVER['REMOTE_ADDR'];
+}
+
+/*
+ * close the http connection
+ */
+
+$size = ob_get_length();
+header("Content-Length: $size");
+header('Connection: close');
+ob_end_flush();
+ob_flush();
+flush();
+if (session_id()) session_write_close();
+
+/*
+ * run the rest in background processes
+ */
+
 require 'vendor/autoload.php';
 
 try {
-
-    /*
-     * check parameters
-     */
-
-    if (!empty($_REQUEST['IPADDR'])) {
-        $deviceIp = $_REQUEST['IPADDR'];
-    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $deviceIp = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $deviceIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $deviceIp = $_SERVER['REMOTE_ADDR'];
-    }
-
-
-
 
 
     /*
