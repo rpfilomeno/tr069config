@@ -157,7 +157,9 @@ class ScanCommand extends Command
                         $this->logger->debug('Device "' . $deviceIp . '" ping timeout.');
                         continue;
                     }  else {
-                        $this->logger->debug('Device "' . $deviceIp . '" ping reply '.$response);
+                        $response = $response * 1000;
+                        $response = round($response,3);
+                        $this->logger->debug('Device "' . $deviceIp . '" ping reply '.$response .' ms');
                     }
                 }
 
@@ -210,6 +212,14 @@ class ScanCommand extends Command
                                     . '" using "' . $eSpaceUsername . ':' . $eSpacePassword . '" '
                                     . 'at attempt ' . $i . '/' . count($csvDefaultAccountList) . '');
                             } else {
+                                if (count($passwordModes) > 1 && $passwordMode === false) {
+                                    $logMsg = 'Succeeded non-hashed ';
+                                } else {
+                                    $logMsg = 'Succeeded hashed ';
+                                }
+                                $this->logger->debug($logMsg . 'login to "' . $deviceIp
+                                    . '" using "' . $eSpaceUsername . ':' . $eSpacePassword . '" '
+                                    . 'at attempt ' . $i . '/' . count($csvDefaultAccountList) . '');
                                 break; //stop trying different password mode
                             }
                         }//Password mode loop
