@@ -33,7 +33,7 @@ class ScanCommand extends Command
         $opts->add('u|username:', 'default username to connect to the device.');
         $opts->add('p|password:', 'default password to connect to the device.');
         $opts->add('a|accounts-list:', 'csv file containing the list of default usermame and password.');
-        $opts->add('t|timeout:', 'set the ping timeout in seconds.');
+        $opts->add('t|timeout:', 'set the ping timeout in seconds. Set to 0 to disable ping check before connection.');
 
     }
 
@@ -150,13 +150,15 @@ class ScanCommand extends Command
 
                 //** ping the device */
 
-                $response = $this->ping($deviceIp,$pingTimeout);
-                $this->logger->debug('ScanCommand::ping = ' . var_export($response, true));
-                if(!$response) {
-                    $this->logger->debug('Device "' . $deviceIp . '" ping timeout.');
-                    continue;
-                }  else {
-                    $this->logger->debug('Device "' . $deviceIp . '" ping reply '.$response);
+                if($pingTimeout > 0) {
+                    $response = $this->ping($deviceIp,$pingTimeout);
+                    $this->logger->debug('ScanCommand::ping = ' . var_export($response, true));
+                    if(!$response) {
+                        $this->logger->debug('Device "' . $deviceIp . '" ping timeout.');
+                        continue;
+                    }  else {
+                        $this->logger->debug('Device "' . $deviceIp . '" ping reply '.$response);
+                    }
                 }
 
                 //** do accounts */
@@ -169,13 +171,21 @@ class ScanCommand extends Command
 
                     //** do connection modes */
                     foreach($connectionModes as $connectionText => $connectionMode) {
-                        $this->logger->debug('Checking IP "' . $deviceIp . ' using ' . $connectionText . ' mode.');
                         $eSpace = new \Tr069Config\Espace\EspaceClass($connectionMode.'://' . $deviceIp, null, $eSpaceUsername);
                         $response = $eSpace->requestSession($eSpaceUsername);
                         $this->logger->debug2('EspaceClass::requestSession = ' . var_export($response, true));
                         if (!$response->success) {
-                            $this->logger->debug('Unable to open ' . $connectionText. ' session to "' . $deviceIp . '".');
+                            $this->logger->debug('Failed connection to device "' . $deviceIp
+                                . ' using ' . $connectionText
+                                . ' mode with username "'.$eSpaceUsername.'".'
+                                .'at attempt ' . $i . '/' . count($csvDefaultAccountList) . ''
+                            );
                         } else {
+                            $this->logger->debug('Successful connection to device "' . $deviceIp
+                                . ' using ' . $connectionText
+                                . ' mode with username "'.$eSpaceUsername.'".'
+                                .'at attempt ' . $i . '/' . count($csvDefaultAccountList) . ''
+                            );
                             break; //stop trying other connection mode
                         }
                     }//connection mode loop
