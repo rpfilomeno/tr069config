@@ -40,6 +40,8 @@ if (session_id()) session_write_close();
  * run the rest in background processes
  */
 
+sleep(60); //wait for at least 60 seconds until reconfiguring the device
+
 require 'vendor/autoload.php';
 
 try {
