@@ -40,8 +40,6 @@ if (session_id()) session_write_close();
  * run the rest in background processes
  */
 
-sleep(60); //wait for at least 60 seconds until reconfiguring the device
-
 require 'vendor/autoload.php';
 
 try {
@@ -99,6 +97,7 @@ try {
     $response->data = null;
 
     $xmlConfigFilename = null;
+    $infoFilename = null;
     $eSpaceUsername = null;
     $eSpacePassword = null;
     $csvConfigData = null;
@@ -170,14 +169,20 @@ try {
 
         //** do display result */
         $hardwareInfo = json_decode($response->data)->stMainVersionInfo;
-        error_log('Hardware information for '
-            . ' Device="' . $deviceIp . '"'
-            . ', Main SoftWare Version='    . $hardwareInfo->szMainSoftWareVersion .'"'
-            . ', Boot Version='             . $hardwareInfo->szBootVersion .'"'
-            . ', HardWare Version='         . $hardwareInfo->szHardWareVersion .'"'
-            . ', Serial Number='            . $hardwareInfo->szSN .'"'
-            . ', Build Version='            . $hardwareInfo->szBuildVersion .'"'
-        );
+
+        $msg = ''
+            . 'Device="'                    . $deviceIp .'"'
+            . ', Serial Number="'           . $hardwareInfo->szSN .'"'
+            . ', Main SoftWare Version="'   . $hardwareInfo->szMainSoftWareVersion .'"'
+            . ', Boot Version="'            . $hardwareInfo->szBootVersion .'"'
+            . ', HardWare Version="'        . $hardwareInfo->szHardWareVersion .'"'
+            . ', uild Version="'            . $hardwareInfo->szBuildVersion .'"';
+
+        error_log('Hardware information for ' . $msg );
+
+        //** Save the hardware information */
+        $infoFilename = realpath(dirname(__FILE__)) . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.info';
+        file_put_contents($infoFilename, date("D M d H:i:s y")."\n" . str_replace(',',"\n",$msg));
     }
 
     /*
@@ -224,6 +229,11 @@ try {
         error_log('Device="' . $deviceIp . '" with SerialNumber="'.$hardwareInfo->szSN . '" was not found in ConfigFile="'.$xmlConfigFilename.'"');
         exit;
     }
+
+    foreach($csvConfigData as $key=>$data) $msg[] = $key.'="' . $data .'"';
+    $msg = 'Device="' . $deviceIp . '" configuration data ' . implode(',',$msg);
+    error_log($msg);
+
 
 
 // Configuring UserCfg
@@ -433,13 +443,25 @@ try {
 
     $xmlString = $xmlConfig->saveXML();
 
+    /*
+     * save a copy of xml file
+     */
+
+    $xmlConfigFilename = realpath(dirname(__FILE__)) . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.xml';
+    file_put_contents($xmlConfigFilename, $xmlString);
+
+    /*
+     * upload the configuration file
+     */
+
     $temp_file = tempnam(sys_get_temp_dir(), 'eSp');
     file_put_contents($temp_file, $xmlString);
-
     $response = $eSpace->requestImportConfig($temp_file);
     if (!$response->success) {
         error_log('Failed upload XML configuration to Device="' . $deviceIp . "'");
+        exit;
     }
+
 } catch (\Exception $e) {
     error_log($e->getMessage());
 }
