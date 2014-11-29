@@ -96,7 +96,7 @@ class ScanCommand extends Command
             if ($this->options->has('accounts-list')) {
                 $defaultAccountsListFile = $this->options['accounts-list']->value;
             } else {
-                $defaultAccountsListFile = realpath(dirname(__FILE__)) . '/data/default-accounts.csv';
+                $defaultAccountsListFile = realpath(dirname(__FILE__)) . '/../data/default-accounts.csv';
             }
             if (file_exists($defaultAccountsListFile)) {
                 $rows = array_map('str_getcsv', file($defaultAccountsListFile));
