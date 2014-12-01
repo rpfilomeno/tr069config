@@ -127,7 +127,11 @@ class EspaceClass
     }
 
     public function requestImportConfig($filename) {
-        $request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,null,['file' => '@'.$filename]);
+        //$request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,null,['file' => '@'.$filename]);
+        $request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,[
+            'X-Requested-With'=>'XMLHttpRequest',
+            'debug' => $this->isDebug,
+        ],'');
         $handle = fopen($filename, 'w');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
