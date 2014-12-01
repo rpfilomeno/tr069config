@@ -266,8 +266,10 @@ class ScanCommand extends Command
                         $importFilename = realpath(dirname(__FILE__).'/../') . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.xml';
                         $response = $eSpace->requestImportConfig($importFilename);
                         if (!$response->success) {
-                            $this->logger->error('Cannot write downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
+                            $this->logger->error('Cannot  downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
                             //non-fatal, continue operation
+                        } else {
+                            $this->logger->debug('Downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
                         }
 
                     }
