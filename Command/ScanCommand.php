@@ -267,7 +267,7 @@ class ScanCommand extends Command
                         touch($importFilename);
                         $response = $eSpace->requestImportConfig($importFilename);
                         if (!$response->success) {
-                            $this->logger->error('Cannot  downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
+                            $this->logger->error('Cannot downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
                             //non-fatal, continue operation
                         } else {
                             $this->logger->debug('Downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');

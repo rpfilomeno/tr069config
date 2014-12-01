@@ -127,12 +127,14 @@ class EspaceClass
     }
 
     public function requestImportConfig($filename) {
-        $request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,null,['file' => '@'.$filename])->setResponseBody($filename);
+        $request = $this->client->post(EspaceClass::ESPACE_WEB_ImportConfig,null,['file' => '@'.$filename]);
+        $handle = fopen($filename, 'w');
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
         $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
         $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
+        $request->getCurlOptions()->set(CURLOPT_FILE, $handle);
         try{
             $response = $request->send();
         } catch (\Exception $e){
@@ -141,6 +143,7 @@ class EspaceClass
             $response->data = '';
             return $response;
         }
+        fclose($handle);
         return json_decode( $response->getBody(true));
     }
 
