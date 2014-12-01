@@ -120,8 +120,9 @@ try {
             $eSpace = new \Tr069Config\Espace\EspaceClass($connectionMode.'://' . $deviceIp, null, $eSpaceUsername);
             $response = $eSpace->requestSession($eSpaceUsername);
             if (!$response->success) {
-                error_log('Failed to connect with ConnMode="' . $connectionText. '" to Device="' . $deviceIp . '".');
+                error_log('Failed to connect with ConnMode="' . $connectionText. '" to Device="' . $deviceIp . '" using Username="' . $eSpaceUsername.'" Attempt="' . $i . ' MaxAttempt="'. count($csvDefaultAccountList) . '".');
             } else {
+                error_log('Successful to connect with ConnMode="' . $connectionText. '" to Device="' . $deviceIp . '" using Username="' . $eSpaceUsername.'" Attempt="' . $i . ' MaxAttempt="'. count($csvDefaultAccountList) . '".');
                 break; //stop trying other connection mode
             }
         }//connection mode loop
