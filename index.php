@@ -231,9 +231,10 @@ try {
         exit;
     }
 
+    $msg=array();
     foreach($csvConfigData as $key=>$data) $msg[] = $key.'="' . $data .'"';
-    $msg = 'Device="' . $deviceIp . '" configuration data ' . implode(',',$msg);
-    error_log($msg);
+    $msglog = 'Device="' . $deviceIp . '" configuration data ' . implode(',',$msg);
+    error_log($msglog);
 
 
 
