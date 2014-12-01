@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * Sample: php tr069config.php --debug scan --write ip-list.txt 10.55.54.170 10.55.54.179 admin admin123
+ * Sample: php tr069config.php --debug scan --write ip-list.txt 10.1.60.15 10.1.60.100
  *
  */
 
@@ -34,6 +34,8 @@ class ScanCommand extends Command
         $opts->add('p|password:', 'default password to connect to the device.');
         $opts->add('a|accounts-list:', 'csv file containing the list of default usermame and password.');
         $opts->add('t|timeout:', 'set the ping timeout in seconds. Set to 0 to disable ping check before connection.');
+        $opts->add('d|download', 'download the xml configuration file from the device.');
+
 
     }
 
@@ -258,6 +260,12 @@ class ScanCommand extends Command
                         . $hardwareInfo->szHardWareVersion . ','
                         . $hardwareInfo->szBuildVersion;
 
+
+                    //** optional, do download xml config */
+                    if ($this->options->has('download')) {
+                        $importFilename = realpath(dirname(__FILE__).'/../') . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.xml';
+                        $response = $eSpace->requestImportConfig($importFilename);
+                    }
                 }
             } //IP loop
             $this->logger->info('Finished. Scan found ' . count($ipList) . ' eSpace device(s).');
@@ -265,7 +273,7 @@ class ScanCommand extends Command
             //** optional, save to IP list */
 
             if (count($ipList) && $this->options->has('write')) {
-                file_put_contents($this->options['write']->value, implode("\n", $ipList));
+                file_put_contents($this->options['write']->value, implode("\n\r", $ipList));
                 $this->logger->info('Scan result written to file "' . $this->options['write']->value . '"');
             }
 
