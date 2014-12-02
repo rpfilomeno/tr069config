@@ -22,7 +22,7 @@ class EspaceClass
 
     const ESPACE_WEB_PASSWORD_MODE_MD5 = 'md5';
     const ESPACE_WEB_PASSWORD_MODE_BASE64 = 'base64';
-    const ESPACE_WEB_PASSWORD_MODE_BASE64ALT = 'base64';
+    const ESPACE_WEB_PASSWORD_MODE_BASE64ALT = 'base64alt';
 
 
     private $client = null;
