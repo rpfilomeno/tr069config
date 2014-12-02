@@ -197,7 +197,7 @@ class ScanCommand extends Command
                                 . ' at attempt ' . $i . '/' . count($csvDefaultAccountList) . '.'
                             );
                         } else {
-                            $this->logger->debug('Successful connection to device "' . $deviceIp
+                            $this->logger->info('SUCCESSFUL connection to device "' . $deviceIp
                                 . ' using ' . $connectionText
                                 . ' mode with username "'.$eSpaceUsername.'"'
                                 . ' at attempt ' . $i . '/' . count($csvDefaultAccountList) . '.'
@@ -216,20 +216,26 @@ class ScanCommand extends Command
                             $eSpace->setPasswordMode($passwordMode);
 
                             $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
+                            if($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT) {
+                                $password = base64_encode($eSpacePassword);
+                                $password = substr($password, 0, -1).':';
+                            }elseif($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64) {
+                                $password = base64_encode($eSpacePassword);
+                            }elseif($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_MD5) {
+                                $password = md5($eSpaceUsername.':'.$eSpacePassword.':'.$eSpace->getSessionId());
+                            }else{
+                                $password = $eSpacePassword;
+                            }
+
                             $this->logger->debug2('EspaceClass::requestCertificate = ' . var_export($response, true));
                             if (!$response->success) {
 
                                 $this->logger->debug('Failed ' . $passwordMode . ' login to "' . $deviceIp
-                                    . '" using "' . $eSpaceUsername . ':' . $eSpacePassword . '" '
+                                    . '" using "' . $eSpaceUsername . ':' . $password . '" '
                                     . 'at attempt ' . $i . '/' . count($csvDefaultAccountList) . '');
                             } else {
-                                if (count($passwordModes) > 1 && $passwordMode === false) {
-                                    $logMsg = 'Succeeded non-hashed ';
-                                } else {
-                                    $logMsg = 'Succeeded hashed ';
-                                }
-                                $this->logger->debug($logMsg . 'login to "' . $deviceIp
-                                    . '" using "' . $eSpaceUsername . ':' . $eSpacePassword . '" '
+                                $this->logger->info('SUCCESSFUL ' . $passwordMode . ' login to "' . $deviceIp
+                                    . '" using "' . $eSpaceUsername . ':' . $password . '" '
                                     . 'at attempt ' . $i . '/' . count($csvDefaultAccountList) . '');
                                 break; //stop trying different password mode
                             }
