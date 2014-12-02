@@ -95,9 +95,13 @@ class ScanCommand extends Command
                 $connectionModes = array('secure'=>'https','insecure'=>'http');
             }
             if ($this->options->has('hash-password')) { //force use hash-only password
-                $passwordModes = array(true);
+                $passwordModes = $this->options['hash-password']->value;
             } else { //use hash then fallback to non-hash password
-                $passwordModes = array(true, false);
+                $passwordModes = array(
+                    EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT,
+                    EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64,
+                    EspaceClass::ESPACE_WEB_PASSWORD_MODE_MD5
+                );
             }
 
             if ($this->options->has('timeout')) { //ping timeout
