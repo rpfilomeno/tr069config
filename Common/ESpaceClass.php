@@ -20,11 +20,16 @@ class EspaceClass
     const ESPACE_WEB_ExportConfig = 'exportfile?Type=xml';
     const ESPACE_WEB_ImportConfig = 'importconfig?filename=Config-eSpace7910.xml';
 
+    const ESPACE_WEB_PASSWORD_MODE_MD5 = 'md5';
+    const ESPACE_WEB_PASSWORD_MODE_BASE64 = 'base64';
+    const ESPACE_WEB_PASSWORD_MODE_BASE64ALT = 'base64';
+
+
     private $client = null;
     private $cookiePlugin = null;
 
     private $isDebug = false;
-    private $isHashPassword = false;
+    private $passwordMode = null;
     private $sessionId = null;
 
     public function __construct($baseUrl = '', $config = null)
@@ -43,9 +48,14 @@ class EspaceClass
         $this->isDebug = $isDebug;
     }
 
-    public function setUseHashPassword( $isHashPassword=false )
+    public function setPasswordMode( $passwordMode)
     {
-        $this->isHashPassword = $isHashPassword;
+        $passwordModes = array($this::ESPACE_WEB_PASSWORD_MODE_BASE64ALT, $this::ESPACE_WEB_PASSWORD_MODE_BASE64, $this::ESPACE_WEB_PASSWORD_MODE_MD5);
+        if(in_array($passwordMode,$passwordModes)){
+            $this->passwordMode = $passwordMode;
+        } else {
+            throw new \Exception('Invalid password mode.');
+        }
     }
 
     public function getSessionId()
@@ -84,7 +94,15 @@ class EspaceClass
 
     public function requestCertificate( $username = 'admin', $password = '' )
     {
-        $password = ($this->isHashPassword) ? md5($username.':'.$password.':'.$this->sessionId) : base64_encode($password);
+        if($this->passwordMode == $this::ESPACE_WEB_PASSWORD_MODE_BASE64ALT) {
+            $password = base64_encode($password);
+            $password = substr($password, 0, -1).':';
+        }elseif($this->passwordMode == $this::ESPACE_WEB_PASSWORD_MODE_BASE64) {
+            $password = base64_encode($password);
+        }elseif($this->passwordMode == $this::ESPACE_WEB_PASSWORD_MODE_MD5) {
+            $password = md5($username.':'.$password.':'.$this->sessionId);
+        }
+
         $request = $this->client->post(EspaceClass::ESPACE_WEB_RequestCertificate,[
             'Content-Type'=>'application/json',
             'debug' => $this->isDebug,
@@ -134,6 +152,30 @@ class EspaceClass
         $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
         $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
         try{
+            $response = $request->send();
+        } catch (\Exception $e) {
+            $response = new \stdClass();
+            $response->success = 0;
+            $response->data = '';
+            return $response;
+        }
+        return json_decode( $response->getBody(true));
+    }
+
+    public function requestExportConfig($toFilename) {
+        $handle = fopen($toFilename,'w');
+        $request = $this->client->post(EspaceClass::ESPACE_WEB_ExportConfig,[
+            'X-Requested-With'=>'XMLHttpRequest',
+            'debug' => $this->isDebug,
+        ],'');
+        $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYHOST, false);
+        $request->getCurlOptions()->set(CURLOPT_SSL_VERIFYPEER, false);
+        $request->getCurlOptions()->set(CURLOPT_AUTOREFERER, true);
+        $request->getCurlOptions()->set(CURLOPT_FOLLOWLOCATION, true);
+        $request->getCurlOptions()->set(CURLOPT_UNRESTRICTED_AUTH, true);
+        $request->getCurlOptions()->set(CURLOPT_RETURNTRANSFER, true);
+        $request->getCurlOptions()->set(CURLOPT_FILE, $handle);
+        try {
             $response = $request->send();
         } catch (\Exception $e){
             $response = new \stdClass();

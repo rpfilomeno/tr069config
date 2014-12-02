@@ -9,6 +9,7 @@ namespace Tr069Config\Command;
 
 use CLIFramework\Command;
 use CLIFramework\Exception\InvalidCommandArgumentException;
+use Tr069Config\Espace\EspaceClass;
 
 class ScanCommand extends Command
 {
@@ -29,7 +30,14 @@ class ScanCommand extends Command
         $opts->add('w|write:', 'write the IP addresses of detected eSpace devices.');
         $opts->add('i|insecure', 'force non-https connection.');
         $opts->add('s|secure', 'force non-https connection.');
-        $opts->add('h|hash-password', 'provide password as a hash rather than plain-text.');
+        $opts->add('h|hash-password:', 'use a specific hash password mode')
+            ->isa('string')
+            ->valueName('password mode')
+            ->validValues([
+                EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT,
+                EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64,
+                EspaceClass::ESPACE_WEB_PASSWORD_MODE_MD5
+            ]);
         $opts->add('u|username:', 'default username to connect to the device.');
         $opts->add('p|password:', 'default password to connect to the device.');
         $opts->add('a|accounts-list:', 'csv file containing the list of default usermame and password.');
@@ -200,17 +208,14 @@ class ScanCommand extends Command
                         //** do logins */
                         foreach ($passwordModes as $passwordMode) {
 
-                            $eSpace->setUseHashPassword($passwordMode);
+
+                            $eSpace->setPasswordMode($passwordMode);
 
                             $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
                             $this->logger->debug2('EspaceClass::requestCertificate = ' . var_export($response, true));
                             if (!$response->success) {
-                                if (count($passwordModes) > 1 && $passwordMode === false) {
-                                    $logMsg = 'Failed non-hashed ';
-                                } else {
-                                    $logMsg = 'Failed hashed ';
-                                }
-                                $this->logger->debug($logMsg . 'login to "' . $deviceIp
+
+                                $this->logger->debug('Failed ' . $passwordMode . ' login to "' . $deviceIp
                                     . '" using "' . $eSpaceUsername . ':' . $eSpacePassword . '" '
                                     . 'at attempt ' . $i . '/' . count($csvDefaultAccountList) . '');
                             } else {
