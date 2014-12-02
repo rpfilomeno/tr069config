@@ -50,7 +50,10 @@ class EspaceClass
 
     public function setPasswordMode( $passwordMode)
     {
-        $passwordModes = array($this::ESPACE_WEB_PASSWORD_MODE_BASE64ALT, $this::ESPACE_WEB_PASSWORD_MODE_BASE64, $this::ESPACE_WEB_PASSWORD_MODE_MD5);
+        $passwordModes = array(
+            $this::ESPACE_WEB_PASSWORD_MODE_BASE64ALT,
+            $this::ESPACE_WEB_PASSWORD_MODE_BASE64,
+            $this::ESPACE_WEB_PASSWORD_MODE_MD5);
         if(in_array($passwordMode,$passwordModes)){
             $this->passwordMode = $passwordMode;
         } else {

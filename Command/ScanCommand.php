@@ -95,7 +95,7 @@ class ScanCommand extends Command
                 $connectionModes = array('secure'=>'https','insecure'=>'http');
             }
             if ($this->options->has('hash-password')) { //force use hash-only password
-                $passwordModes = $this->options['hash-password']->value;
+                $passwordModes = array($this->options['hash-password']->value);
             } else { //use hash then fallback to non-hash password
                 $passwordModes = array(
                     EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT,
