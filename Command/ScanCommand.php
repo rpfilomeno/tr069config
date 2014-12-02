@@ -216,12 +216,12 @@ class ScanCommand extends Command
                             $eSpace->setPasswordMode($passwordMode);
 
                             $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
-                            if($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT) {
+                            if($passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64ALT) {
                                 $password = base64_encode($eSpacePassword);
                                 $password = substr($password, 0, -1).':';
-                            }elseif($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64) {
+                            }elseif($passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_BASE64) {
                                 $password = base64_encode($eSpacePassword);
-                            }elseif($this->passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_MD5) {
+                            }elseif($passwordMode == EspaceClass::ESPACE_WEB_PASSWORD_MODE_MD5) {
                                 $password = md5($eSpaceUsername.':'.$eSpacePassword.':'.$eSpace->getSessionId());
                             }else{
                                 $password = $eSpacePassword;
