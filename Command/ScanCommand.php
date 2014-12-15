@@ -278,14 +278,14 @@ class ScanCommand extends Command
 
                     //** optional, do download xml config */
                     if ($this->options->has('download')) {
-                        $importFilename = realpath(dirname(__FILE__).'/../') . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.xml';
+                        $exportFilename = realpath(dirname(__FILE__).'/../') . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.xml';
 
-                        $response = $eSpace->requestImportConfig($importFilename);
+                        $response = $eSpace->requestExportConfig($exportFilename);
                         if (!$response->success) {
-                            $this->logger->error('Cannot download xml file to '. $importFilename .' for ' . $deviceIp . '.');
+                            $this->logger->error('Cannot download xml file to '. $exportFilename .' for ' . $deviceIp . '.');
                             //non-fatal, continue operation
                         } else {
-                            $this->logger->debug('Downloaded xml file to '. $importFilename .' for ' . $deviceIp . '.');
+                            $this->logger->debug('Downloaded xml file to '. $exportFilename .' for ' . $deviceIp . '.');
                         }
 
                     }

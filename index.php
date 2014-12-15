@@ -133,7 +133,7 @@ try {
             //** do logins */
             foreach ($passwordModes as $passwordMode) {
 
-                $eSpace->setUseHashPassword($passwordMode);
+                $eSpace->setPasswordMode($passwordMode);
 
                 $response = $eSpace->requestCertificate($eSpaceUsername, $eSpacePassword);
                 if (!$response->success) {
