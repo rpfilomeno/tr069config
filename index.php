@@ -8,6 +8,7 @@ ob_start();
 error_reporting(E_ALL);
 ignore_user_abort(true);
 set_time_limit(0);
+date_default_timezone_set('Asia/Singapore');
 
 /*
  * check parameters
@@ -97,10 +98,12 @@ try {
     $response->data = null;
 
     $xmlConfigFilename = null;
+    $lockFilename = null;
     $infoFilename = null;
     $eSpaceUsername = null;
     $eSpacePassword = null;
     $csvConfigData = null;
+    $deviceMac = null;
 
 
     /*
@@ -453,6 +456,18 @@ try {
     file_put_contents($xmlConfigFilename, $xmlString);
 
     /*
+     * check a lock file.
+     * TODO: DHCP option 46 will always set the ACS url on boot even if the URL was changed in the configuration xml. A quick fix, we create a lock file to prevent tr069config from reconfiguring the phone on boot thus creating a indefinite reboot loop.
+     */
+
+    $lockFilename = realpath(dirname(__FILE__)) . '/data/Config-eSpace-' . $hardwareInfo->szSN . '.lock';
+    if(file_exists($lockFilename)) {
+        error_log('The Device="' . $deviceIp . '" has a LockFile="' . $lockFilename . '" that must be deleted to continue re-provision');
+        exit;
+    }
+
+
+    /*
      * upload the configuration file
      */
 
@@ -463,6 +478,15 @@ try {
         error_log('Failed upload XML configuration to Device="' . $deviceIp . "'");
         exit;
     }
+
+    /*
+     * create a lock file.
+     *
+     */
+
+    file_put_contents($lockFilename, '{"timestamp":"' . date('m/d/Y h:i:s a', time()) . '","serial":"' . $hardwareInfo->szSN .'","ip":"' . $deviceIp . '"}');
+
+
 
 } catch (\Exception $e) {
     error_log($e->getMessage());
