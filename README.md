@@ -1,6 +1,8 @@
 tr069config
 ===========
 
+[![Join the chat at https://gitter.im/rpfilomeno/tr069config](https://badges.gitter.im/rpfilomeno/tr069config.svg)](https://gitter.im/rpfilomeno/tr069config?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Configures Huawei eSpace devices via CLI and TR069
 
 Examples
